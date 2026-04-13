@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      background: #ffffff;
+      color: #1e293b;
+      padding: 16px;
+    }
+    .header { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .header svg { flex-shrink: 0; color: #2563eb; }
+    .header h1 { font-size: 16px; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+    
+    .section-label { 
+      font-size: 11px; 
+      color: #475569; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; 
+      margin: 12px 0 8px 0; 
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #f1f5f9;
+    }
+
+    .fields { margin-bottom: 16px; }
+    .fields input {
+      width: 100%; 
+      padding: 9px 12px; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 6px;
+      background: #ffffff; 
+      color: #1e293b; 
+      font-size: 13px; 
+      margin-bottom: 8px; 
+      outline: none;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .fields input:focus { 
+      border-color: #3b82f6; 
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .fields input::placeholder { color: #94a3b8; }
+
+    .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    button {
+      flex: 1; 
+      padding: 10px 14px; 
+      border: 1px solid transparent; 
+      border-radius: 6px; 
+      font-size: 13px;
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    #scan-btn { 
+      background: #ffffff; 
+      color: #334155; 
+      border: 1px solid #e2e8f0; 
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    #scan-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+    
+    #autofill-btn { 
+      background: #2563eb; 
+      color: #ffffff; 
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+    }
+    #autofill-btn:hover { background: #1d4ed8; }
+    #autofill-btn:active { transform: translateY(1px); }
+    
+    #autofill-btn:disabled, #scan-btn:disabled { 
+      opacity: 0.5; 
+      cursor: not-allowed; 
+      transform: none; 
+      box-shadow: none;
+    }
+
+    #clear-btn {
+      width: 100%; 
+      background: #fff1f2; 
+      color: #be123c; 
+      border: 1px solid #ffe4e6;
+      font-weight: 600; 
+      padding: 9px 0; 
+      border-radius: 6px; 
+      font-size: 12px; 
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    #clear-btn:hover { background: #ffe4e6; }
+
+    #status { 
+      margin-top: 14px; 
+      font-size: 12px; 
+      color: #64748b; 
+      text-align: center; 
+      min-height: 18px; 
+      padding: 6px;
+      border-radius: 4px;
+    }
+    #status.success { color: #059669; background: #ecfdf5; font-weight: 500; }
+    #status.error { color: #dc2626; background: #fef2f2; font-weight: 500; }
+
+    .toggle-link { 
+      font-size: 12px; 
+      color: #2563eb; 
+      cursor: pointer; 
+      text-align: center; 
+      margin: 4px 0 12px 0;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .toggle-link:hover { color: #1d4ed8; }
+    .hidden { display: none; }
+
+    .scan-results { 
+      font-size: 12px; 
+      margin-top: 12px; 
+      line-height: 1.8;
+      padding: 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #f1f5f9;
+      color: #475569;
+    }
+    .scan-results .dot { 
+      display: inline-block; 
+      width: 6px; 
+      height: 6px; 
+      border-radius: 50%; 
+      margin-right: 6px; 
+      vertical-align: middle; 
+    }
+    .dot-green { background: #10b981; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-red { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="background: #2563eb; padding: 4px; border-radius: 6px; display: flex;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    </div>
+    <h1>Form Copilot</h1>
+  </div>
+  <p class="subtitle">Intelligent field detection and CRM-driven autofill.</p>
+
+  <div class="toggle-link" id="toggle-fields">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+    Manage CRM Data
+  </div>
+  
+  <div id="profile-selector-container" style="margin-bottom: 12px;">
+    <div class="section-label">Active Profile</div>
+    <div style="display: flex; gap: 8px;">
+      <select id="profile-select" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 13px; outline: none; background: #fff;">
+        <option value="0">Default Profile</option>
+      </select>
+      <button id="add-profile-btn" style="flex: 0 0 auto; padding: 0 10px; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 16px;">+</button>
+    </div>
+  </div>
+
+  <div class="fields hidden" id="crm-fields">
+    <div class="section-label">Contact Info</div>
+    <input id="crm-name" placeholder="Full Name" />
+    <input id="crm-first_name" placeholder="First Name" />
+    <input id="crm-last_name" placeholder="Last Name" />
+    <input id="crm-email" placeholder="Email" type="email" />
+    <input id="crm-phone" placeholder="Phone" type="tel" />
+    <input id="crm-company" placeholder="Company" />
+    <input id="crm-job_title" placeholder="Job Title" />
+    <div class="section-label" style="margin-top:8px">Address</div>
+    <input id="crm-address" placeholder="Address" />
+    <input id="crm-city" placeholder="City" />
+    <input id="crm-state" placeholder="State" />
+    <input id="crm-zip" placeholder="Zip" />
+    <input id="crm-country" placeholder="Country" />
+    <input id="crm-website" placeholder="Website" type="url" />
+  </div>
+
+  <div class="btn-row">
+    <button id="scan-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      Scan
+    </button>
+    <button id="autofill-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+      Autofill
+    </button>
+  </div>
+
+  <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+    <button id="export-btn" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; font-size: 11px; padding: 6px 0;">Backup (JSON)</button>
+    <button id="import-btn" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; font-size: 11px; padding: 6px 0;">Restore</button>
+  </div>
+  
+  <button id="clear-btn">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+    Reset All Data
+  </button>
+  <div id="status"></div>
+  <div id="scan-results" class="scan-results hidden"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
